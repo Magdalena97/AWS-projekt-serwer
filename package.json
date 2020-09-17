@@ -1,0 +1,23 @@
+{
+  "name": "sqsconsumer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.752.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jimp": "^0.16.1",
+    "polka": "^0.5.2",
+    "sqs-consumer": "^5.4.0",
+    "uuid": "^8.3.0"
+  }
+}

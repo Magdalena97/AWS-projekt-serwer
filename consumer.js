@@ -1,8 +1,8 @@
 const { Consumer } = require('sqs-consumer');
 const AWS = require('aws-sdk');
-const Jimp = require("jimp");//bibioyeka zajmujaca sie przetwarzaniem obarzkow
+const Jimp = require("jimp");// biblioteka zajmujaca sie przetwarzaniem obrazów
 require('dotenv').config()
-//zeby miec dostep
+
 const {
     AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY,
@@ -20,7 +20,7 @@ AWS.config.update({
 const bucketName = S3_BUCKET_NAME;
 
 const s3bucket = new AWS.S3();
-//funcja przetwarzajaca obrazek z neta 
+//funcja przetwarzająca obrazki
 const processImage = async (source, logoFile, logoMarginPercentage) => {
     const [image, logo] = await Promise.all([
         Jimp.read(source),
@@ -40,18 +40,17 @@ const processImage = async (source, logoFile, logoMarginPercentage) => {
         opacitySource: 0.1,
         opacityDest: 1
     }]);
-    return img.getBufferAsync(Jimp.AUTO);//zwracam przetwrzony obrazek
-};
-  //ggotowa biblioteka-consumer zaczynam monitorowac kolejke
+    return img.getBufferAsync(Jimp.AUTO);//zwracanie przetworzonego obrazka
+}; 
+//funkcja odpowiadajaca za monitorowanie kolejki
   const app = Consumer.create({
-      queueUrl: 'https://sqs.us-east-1.amazonaws.com/205149550397/simplequeue1', // nazwa koejki
-      handleMessage: async (message) => {//jak cos przyjdzie do kolejke odbieranie wiadimosci z kolejki
+      queueUrl: 'https://sqs.us-east-1.amazonaws.com/205149550397/simplequeue1', 
+      handleMessage: async (message) => {//odebranie wiadomości z kolejki jak przyjdzie
           console.log(message)
-          let source = 'https://' + bucketName + '.s3.amazonaws.com/' + message.Body;//towzre sobie url mojego obrazek bo zaraz bede
-          // robila na nim operacje message.body ->unikalny indentyfikator images /ranodowe jak odpale ten adres w przegladarce to bede widziala moj obrzek
-          let watermark = 'https://www.vnaya.com/eonline/images/aws_logo_largerfile.png'; // cos trzeba zrobix z tym obrazkiem i ja robie znak wodny
-          processImage(source, watermark, 20).then(image => {//przetwarznia obazka i jak skonczy sie przetwarzac obrazek to then
-              let params = {//ladyjemy przrtwprzony obrazek do sq
+          let source = 'https://' + bucketName + '.s3.amazonaws.com/' + message.Body;
+          let watermark = 'https://www.vnaya.com/eonline/images/aws_logo_largerfile.png'; 
+          processImage(source, watermark, 20).then(image => {//przetwarzanie obrazka -doklejanie mu znaku wodnego
+              let params = {//Ładowanie paratmetrow i wysylanie przetworzonego obrazka do s3
                   Bucket: bucketName,
                   Key: message.Body + '-watermark',
                   Body: image,
